@@ -1,6 +1,7 @@
 package application;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import javafx.fxml.FXML;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Logger;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
@@ -33,23 +35,22 @@ public class MainSceneController {
     Stage primarystage;
 
     @FXML
-    GridPane gdPaneGame;
+    public GridPane gdPaneGame;
 
+    //public static GridPane gdPaneGameAccess;
+    
     @FXML
     Button btnLoad;
+    @FXML
+    Button btnLoad1;
+    @FXML
+    Button btnLoad2;
 
     int number;
     Player player = new Player();
     //ArrayList<GameCharacter> npcs = new ArrayList<>();
     Random globalRand = new Random(1234);
     
-    public class GameCharacter
-    {
-        GameTile tile;
-        String sprite = "debugcharacter.png";
-        ImageView imgV;
-        int col,row;
-    }
     
 
     
@@ -62,34 +63,35 @@ public class MainSceneController {
         }
     }
 
-    public class GameTile {
-
-        String sprite;
-        StackPane myPane;
-        ImageView imgV;
-
-        public GameTile() {
-            sprite = "debugback.png";
-            myPane = new StackPane();
-            myPane.setMinSize(0, 0);
-
-        }
-
-        public Pane getPane() {
-            return (myPane);
-        }
-
-        public String getSpritePath() {
-            return (sprite);
-        }
-    }
     //GameTile[][] board = null;
- int gridSize = 10;
+ public final static int gridSize = 10;
        Level curLevel;
+    
+       @FXML
+        public void setLevelDefault(ActionEvent event) throws IOException {
+            
+                setGrid(new Level(gdPaneGame));
+            }
+            
     @FXML
-    public void setGrid(ActionEvent event) throws IOException {
+        public void setLevelSurya(ActionEvent event) throws IOException, Exception {
+            
+                setGrid(new LevelSurya(gdPaneGame));
+            }
+            
+            
+            
+            @FXML
+        public void setLevelTovanche(ActionEvent event) throws Exception {
+            
+                setGrid(new LevelTovanche(gdPaneGame));
+            }
+            
+            
+    public void setGrid(Level curLevel) throws IOException {
+        //gdPaneGameAccess = gdPaneGame;
         GameTile curTile;
-        curLevel = new Level();
+        
         GameTile[][] board = curLevel.tiles;// = new GameTile[gridSize][gridSize];
         
          
@@ -110,6 +112,8 @@ public class MainSceneController {
         gdPaneGame.requestFocus();
         
         
+        btnLoad1.setDisable(true);
+        btnLoad2.setDisable(true);
         
         
         btnLoad.setDisable(true);
@@ -160,13 +164,19 @@ public class MainSceneController {
             }
             newCol++;
         }
-        GameTile swap = curLevel.tiles[newRow][newCol];
-        player.tile.myPane.getChildren().remove(player.imgV);
-        swap.myPane.getChildren().add(player.imgV);
-        player.tile = swap;
-        player.col = newCol;
-        player.row = newRow;
+        GameTile swap;
+        //curLevel.tiles[0][0].blocker = true;
         
+        
+        if (curLevel.tiles[newRow][newCol].blocker == false)
+        {
+            swap = curLevel.tiles[newRow][newCol];
+            player.tile.myPane.getChildren().remove(player.imgV);
+            swap.myPane.getChildren().add(player.imgV);
+            player.tile = swap;
+            player.col = newCol;
+            player.row = newRow;
+        }        
         for (GameCharacter curChar : curLevel.npcs)
         {
             boolean useCol = globalRand.nextBoolean();
@@ -216,12 +226,15 @@ public class MainSceneController {
             }
             try
             {
-        swap = curLevel.tiles[newRow][newCol];
-        curChar.tile.myPane.getChildren().remove(curChar.imgV);
-        swap.myPane.getChildren().add(curChar.imgV);
-        curChar.tile = swap;
-        curChar.col = newCol;
-        curChar.row = newRow;
+                if (curLevel.tiles[newRow][newCol].blocker == false)
+                {
+                    swap = curLevel.tiles[newRow][newCol];
+                    curChar.tile.myPane.getChildren().remove(curChar.imgV);
+                    swap.myPane.getChildren().add(curChar.imgV);
+                    curChar.tile = swap;
+                    curChar.col = newCol;
+                    curChar.row = newRow;
+                }
             }
             catch(Exception e)
             {
