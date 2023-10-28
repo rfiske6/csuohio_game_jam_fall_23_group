@@ -36,7 +36,7 @@
 
                     if (i == 1 && j == 0) {
                         try {
-                            addBlocker(curTile, walls, "tovanche/wall.png");
+                            addBlocker(curTile, walls, "tovanche/Blocker.png");
 
                         }   catch (Exception ex){
                         }
